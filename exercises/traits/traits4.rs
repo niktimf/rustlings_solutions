@@ -7,23 +7,29 @@
 // Execute `rustlings hint traits4` or use the `hint` watch subcommand for a
 // hint.
 
-// I AM NOT DONE
-
 pub trait Licensed {
     fn licensing_info(&self) -> String {
         "some information".to_string()
     }
 }
-
+#[derive(Clone)]
 struct SomeSoftware {}
-
+#[derive(Clone)]
 struct OtherSoftware {}
 
 impl Licensed for SomeSoftware {}
 impl Licensed for OtherSoftware {}
 
 // YOU MAY ONLY CHANGE THE NEXT LINE
-fn compare_license_types(software: ??, software_two: ??) -> bool {
+fn compare_license_types(software: impl Licensed, software_two: impl Licensed) -> bool {
+    software.licensing_info() == software_two.licensing_info()
+}
+
+// or
+fn compare_license_types_generic<T, U>(software: T, software_two: U) -> bool
+where T: Licensed,
+      U: Licensed
+{
     software.licensing_info() == software_two.licensing_info()
 }
 
@@ -36,7 +42,8 @@ mod tests {
         let some_software = SomeSoftware {};
         let other_software = OtherSoftware {};
 
-        assert!(compare_license_types(some_software, other_software));
+        assert!(compare_license_types(some_software.clone(), other_software.clone()));
+        assert!(compare_license_types_generic(some_software.clone(), other_software.clone()));
     }
 
     #[test]
@@ -44,6 +51,7 @@ mod tests {
         let some_software = SomeSoftware {};
         let other_software = OtherSoftware {};
 
-        assert!(compare_license_types(other_software, some_software));
+        assert!(compare_license_types(other_software.clone(), some_software.clone()));
+        assert!(compare_license_types_generic(other_software.clone(), some_software.clone()));
     }
 }
